@@ -1,0 +1,42 @@
+// Interview Tracker database schema.
+// Hosted PostgreSQL (Neon) so the data is shared across every device.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  /// Pooled connection — used by the running app.
+  url       = env("DATABASE_URL")
+  /// Direct (non-pooled) connection — used by migrations.
+  directUrl = env("DIRECT_URL")
+}
+
+/// A job-portal profile (e.g. "Prince - React Dev" on Naukri).
+model Profile {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  color     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  counts    DailyCount[]
+}
+
+/// One row per profile per day holding all counters for that day.
+model DailyCount {
+  id        String   @id @default(cuid())
+  profileId String
+  /// Calendar day as "YYYY-MM-DD" (timezone-free on purpose).
+  date      String
+  calls     Int      @default(0)
+  round1    Int      @default(0)
+  round2    Int      @default(0)
+  round3    Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, date])
+  @@index([date])
+}
