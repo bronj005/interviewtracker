@@ -1,5 +1,5 @@
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { getCalendarDays, monthKey, parseMonthParam } from "@/lib/dates";
+import { getCalendarDays, monthKey, parseISODate, parseMonthParam, todayISO } from "@/lib/dates";
 import { listCounts } from "@/server/counts";
 import { listProfiles } from "@/server/profiles";
 
@@ -11,7 +11,8 @@ interface HomeProps {
 
 export default async function HomePage({ searchParams }: HomeProps) {
   const { m } = await searchParams;
-  const ym = parseMonthParam(typeof m === "string" ? m : undefined);
+  // Default month follows India time, not the server clock (UTC on Vercel).
+  const ym = parseMonthParam(typeof m === "string" ? m : undefined, parseISODate(todayISO()));
   const days = getCalendarDays(ym);
 
   const [profiles, counts] = await Promise.all([

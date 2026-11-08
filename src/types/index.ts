@@ -16,4 +16,5 @@ export interface DailyCount extends MetricValues {
   profileId: string;
   /** "YYYY-MM-DD" */
   date: string;
+  note: string | null;
 }

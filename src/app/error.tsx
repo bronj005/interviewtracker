@@ -12,7 +12,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
   return (
     <Box className="mx-auto max-w-md p-6 text-center">
       <h1 className="text-lg font-black">Something went wrong</h1>
-      <p className="mt-1 text-sm text-neutral-600">
+      <p className="mt-1 text-sm text-ink-muted">
         The data could not be loaded. Check your internet connection and that <code>DATABASE_URL</code> is set,
         then try again.
       </p>

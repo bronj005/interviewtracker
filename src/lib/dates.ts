@@ -7,12 +7,25 @@
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 const MONTH_RE = /^(\d{4})-(\d{2})$/;
 
+/** Timezone used to decide "today" on the server (Vercel runs in UTC). */
+export const APP_TIMEZONE = "Asia/Kolkata";
+
 export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function toISODate(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Today's date ("YYYY-MM-DD") in APP_TIMEZONE, regardless of the machine's timezone. */
+export function todayISO(now = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: APP_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
 }
 
 export function isValidISODate(value: string): boolean {
@@ -32,6 +45,22 @@ export function addDays(value: string, days: number): string {
   const d = parseISODate(value);
   d.setDate(d.getDate() + days);
   return toISODate(d);
+}
+
+/** Monday of the week containing `value`. */
+export function startOfWeek(value: string): string {
+  const d = parseISODate(value);
+  return addDays(value, -((d.getDay() + 6) % 7));
+}
+
+/** Whole days from `from` to `to` (to − from). */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((parseISODate(to).getTime() - parseISODate(from).getTime()) / 86_400_000);
+}
+
+/** e.g. "3 Nov" */
+export function formatShortDate(value: string): string {
+  return parseISODate(value).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
 export interface YearMonth {

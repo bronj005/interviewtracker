@@ -33,12 +33,12 @@ export function ProfileFilter({ profiles, value, onChange }: ProfileFilterProps)
               aria-checked={active}
               onClick={() => onChange(p.id)}
               className={cn(
-                "flex h-9 items-center gap-2 whitespace-nowrap border-2 border-neutral-900 px-3 text-sm font-semibold",
-                active ? "bg-neutral-900 text-white" : "bg-white hover:bg-neutral-100",
+                "flex h-9 items-center gap-2 whitespace-nowrap border-2 border-ink px-3 text-sm font-semibold",
+                active ? "bg-ink text-surface" : "bg-surface hover:bg-surface-muted",
               )}
             >
               {p.color && (
-                <span className="size-2.5 border border-neutral-900" style={{ backgroundColor: p.color }} />
+                <span className="size-2.5 border border-ink" style={{ backgroundColor: p.color }} />
               )}
               {p.name}
             </button>

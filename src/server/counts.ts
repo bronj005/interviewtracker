@@ -2,7 +2,7 @@ import "server-only";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { emptyMetrics } from "@/lib/metrics";
-import type { AdjustCountInput } from "@/lib/validation";
+import type { AdjustCountInput, SaveNoteInput } from "@/lib/validation";
 import type { DailyCount, MetricKey } from "@/types";
 
 const countSelect = {
@@ -12,6 +12,7 @@ const countSelect = {
   round1: true,
   round2: true,
   round3: true,
+  note: true,
 } as const;
 
 export function listCounts(from: string, to: string): Promise<DailyCount[]> {
@@ -57,5 +58,32 @@ export async function adjustCount({ profileId, date, metric, delta }: AdjustCoun
   await prisma.dailyCount.updateMany({ where: { profileId, date, ...guard }, data: decrement });
 
   const row = await prisma.dailyCount.findUnique({ where, select: countSelect });
-  return row ?? { profileId, date, ...emptyMetrics() };
+  return row ?? { profileId, date, ...emptyMetrics(), note: null };
+}
+
+/** Sets (or clears, when blank) the note for one profile on one day. */
+export async function saveNote({ profileId, date, note }: SaveNoteInput): Promise<DailyCount> {
+  const where = { profileId_date: { profileId, date } };
+  const value = note.trim() || null;
+
+  if (value === null) {
+    // Clearing: never create an empty row just to store "no note".
+    await prisma.dailyCount.updateMany({ where: { profileId, date }, data: { note: null } });
+    const row = await prisma.dailyCount.findUnique({ where, select: countSelect });
+    return row ?? { profileId, date, ...emptyMetrics(), note: null };
+  }
+
+  try {
+    return await prisma.dailyCount.upsert({
+      where,
+      create: { profileId, date, note: value },
+      update: { note: value },
+      select: countSelect,
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return prisma.dailyCount.update({ where, data: { note: value }, select: countSelect });
+    }
+    throw error;
+  }
 }

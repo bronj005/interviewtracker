@@ -1,5 +1,4 @@
 import { Box } from "@/components/ui/Box";
-import { cn } from "@/lib/cn";
 import { METRICS } from "@/lib/metrics";
 import type { MetricValues } from "@/types";
 
@@ -9,8 +8,10 @@ export function SummaryBar({ totals, caption }: { totals: MetricValues; caption:
       {METRICS.map((m) => (
         <Box key={m.key} className="min-w-0 p-2 sm:p-3">
           <div className="flex items-center gap-1.5">
-            <span className={cn("size-2.5 shrink-0 border border-neutral-900", m.dot)} />
-            <span className="truncate text-[11px] font-bold uppercase tracking-wide text-neutral-600 sm:text-xs">
+            <span aria-hidden="true" className="text-base leading-none sm:text-lg">
+              {m.icon}
+            </span>
+            <span className="truncate text-[11px] font-bold uppercase tracking-wide text-ink-muted sm:text-xs">
               <span className="sm:hidden">{m.short}</span>
               <span className="hidden sm:inline">{m.label}</span>
             </span>

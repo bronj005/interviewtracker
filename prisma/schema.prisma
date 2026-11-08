@@ -33,6 +33,8 @@ model DailyCount {
   round1    Int      @default(0)
   round2    Int      @default(0)
   round3    Int      @default(0)
+  /// Optional free-text note (company, HR contact, interview time…).
+  note      String?
   updatedAt DateTime @updatedAt
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)

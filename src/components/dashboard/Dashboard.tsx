@@ -29,7 +29,7 @@ export function Dashboard({ ym, profiles, initialCounts }: DashboardProps) {
   const from = days[0];
   const to = days[days.length - 1];
 
-  const { get, adjust, error, clearError } = useCounts(initialCounts, from, to);
+  const { get, getNote, adjust, saveNote, error, clearError } = useCounts(initialCounts, from, to);
   const today = useToday();
   const [filter, setFilter] = useState<string>(ALL_PROFILES);
   const [selected, setSelected] = useState<string | null>(null);
@@ -68,6 +68,13 @@ export function Dashboard({ ym, profiles, initialCounts }: DashboardProps) {
     return map;
   }, [days, visibleProfiles, get]);
 
+  /** Days where any visible profile has a note (for the small 📝 marker). */
+  const notedDates = useMemo(() => {
+    const set = new Set<string>();
+    for (const date of days) if (visibleProfiles.some((p) => getNote(p.id, date))) set.add(date);
+    return set;
+  }, [days, visibleProfiles, getNote]);
+
   const monthTotals = useMemo(() => {
     const sum = emptyMetrics();
     for (const date of days) if (isInMonth(date, ym)) addMetrics(sum, totalsByDate[date]);
@@ -83,7 +90,7 @@ export function Dashboard({ ym, profiles, initialCounts }: DashboardProps) {
         <MonthNav ym={ym} />
         <Box className="p-6 text-center">
           <h2 className="text-lg font-black">No profiles yet</h2>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-neutral-600">
+          <p className="mx-auto mt-1 max-w-sm text-sm text-ink-muted">
             Add the job-portal profiles you apply with (e.g. &ldquo;Naukri – React Dev&rdquo;), then start
             counting calls and rounds.
           </p>
@@ -107,6 +114,7 @@ export function Dashboard({ ym, profiles, initialCounts }: DashboardProps) {
       <CalendarGrid
         days={days}
         totalsByDate={totalsByDate}
+        notedDates={notedDates}
         isInMonth={inMonth}
         today={today}
         onSelect={setSelected}
@@ -121,6 +129,8 @@ export function Dashboard({ ym, profiles, initialCounts }: DashboardProps) {
           totals={totalsByDate[selected]}
           getCounts={get}
           onAdjust={adjust}
+          getNote={getNote}
+          onSaveNote={saveNote}
           onPrev={selectedIndex > 0 ? () => setSelected(days[selectedIndex - 1]) : undefined}
           onNext={selectedIndex < days.length - 1 ? () => setSelected(days[selectedIndex + 1]) : undefined}
           onClose={closePanel}

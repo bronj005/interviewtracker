@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PROFILE_COLORS } from "@/lib/colors";
+import { NOTE_MAX_LENGTH } from "@/lib/constants";
 import { isValidISODate } from "@/lib/dates";
 import { METRIC_KEYS } from "@/lib/metrics";
 
@@ -38,6 +39,15 @@ export const adjustCountSchema = z.object({
     .refine((n) => n !== 0, { message: "delta cannot be 0" }),
 });
 
+export const saveNoteSchema = z.object({
+  profileId: z.string().min(1, "profileId is required"),
+  date: isoDate,
+  note: z
+    .string()
+    .trim()
+    .max(NOTE_MAX_LENGTH, `Note must be ${NOTE_MAX_LENGTH} characters or less`),
+});
+
 export const countsRangeSchema = z
   .object({ from: isoDate, to: isoDate })
   .refine((v) => v.from <= v.to, { message: "`from` must be on or before `to`" });
@@ -45,3 +55,4 @@ export const countsRangeSchema = z
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type AdjustCountInput = z.infer<typeof adjustCountSchema>;
+export type SaveNoteInput = z.infer<typeof saveNoteSchema>;

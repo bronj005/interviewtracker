@@ -12,7 +12,7 @@ import { emptyMetrics, METRICS } from "@/lib/metrics";
 import type { ProfileWithTotals } from "@/types";
 
 const inputClass =
-  "h-10 w-full min-w-0 border-2 border-neutral-900 bg-white px-3 text-sm font-medium outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-1";
+  "h-10 w-full min-w-0 border-2 border-ink bg-surface px-3 text-sm font-medium outline-none focus:ring-2 focus:ring-ink focus:ring-offset-1 focus:ring-offset-page";
 
 export function ProfileManager({ initialProfiles }: { initialProfiles: ProfileWithTotals[] }) {
   const router = useRouter();
@@ -68,7 +68,7 @@ export function ProfileManager({ initialProfiles }: { initialProfiles: ProfileWi
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-black tracking-tight sm:text-2xl">Profiles</h1>
-        <p className="text-sm text-neutral-600">The job-portal profiles you apply with every day.</p>
+        <p className="text-sm text-ink-muted">The job-portal profiles you apply with every day.</p>
       </div>
 
       <Box className="p-3">
@@ -91,7 +91,7 @@ export function ProfileManager({ initialProfiles }: { initialProfiles: ProfileWi
       </Box>
 
       {profiles.length === 0 ? (
-        <p className="border-2 border-dashed border-neutral-400 p-6 text-center text-sm text-neutral-500">
+        <p className="border-2 border-dashed border-ink-soft p-6 text-center text-sm text-ink-muted">
           No profiles yet. Add your first one above.
         </p>
       ) : (
@@ -134,7 +134,7 @@ function ProfileRow({ profile, onUpdate, onDelete }: ProfileRowProps) {
       <Box className="space-y-3 p-3">
         <div className="flex items-center gap-2">
           <span
-            className="size-5 shrink-0 border-2 border-neutral-900"
+            className="size-5 shrink-0 border-2 border-ink"
             style={{ backgroundColor: profile.color }}
           />
           <input
@@ -168,23 +168,25 @@ function ProfileRow({ profile, onUpdate, onDelete }: ProfileRowProps) {
               aria-label={`Color ${c}`}
               onClick={() => profile.color !== c && onUpdate(profile.id, { color: c })}
               className={cn(
-                "size-7 border-2 border-neutral-900",
-                profile.color === c && "ring-2 ring-neutral-900 ring-offset-2",
+                "size-7 border-2 border-ink",
+                profile.color === c && "ring-2 ring-ink ring-offset-2 ring-offset-page",
               )}
               style={{ backgroundColor: c }}
             />
           ))}
         </div>
 
-        <dl className="grid grid-cols-4 border-2 border-neutral-900 text-center">
+        <dl className="grid grid-cols-4 border-2 border-ink text-center">
           {METRICS.map((m, i) => (
-            <div key={m.key} className={cn("py-1", i > 0 && "border-l-2 border-neutral-900")}>
-              <dt className={cn("text-[11px] font-bold uppercase", m.text)}>{m.short}</dt>
+            <div key={m.key} className={cn("py-1", i > 0 && "border-l-2 border-ink")}>
+              <dt className={cn("text-[11px] font-bold uppercase", m.text)}>
+                <span aria-hidden="true">{m.icon}</span> {m.short}
+              </dt>
               <dd className="font-black tabular-nums">{profile.totals[m.key]}</dd>
             </div>
           ))}
         </dl>
-        <p className="-mt-2 text-[11px] text-neutral-500">All-time totals</p>
+        <p className="-mt-2 text-[11px] text-ink-muted">All-time totals</p>
       </Box>
     </li>
   );

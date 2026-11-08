@@ -41,6 +41,12 @@ export const api = {
       body: JSON.stringify(input),
     }).then((r) => r.count),
 
+  saveNote: (input: { profileId: string; date: string; note: string }) =>
+    request<{ count: DailyCount }>("/api/notes", {
+      method: "PUT",
+      body: JSON.stringify(input),
+    }).then((r) => r.count),
+
   createProfile: (input: { name: string; color?: string }) =>
     request<{ profile: Profile }>("/api/profiles", {
       method: "POST",

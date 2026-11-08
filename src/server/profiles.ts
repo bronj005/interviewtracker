@@ -1,7 +1,7 @@
 import "server-only";
 import { nextProfileColor } from "@/lib/colors";
 import { prisma } from "@/lib/db";
-import { emptyMetrics } from "@/lib/metrics";
+import { metricsFromSums } from "@/lib/metrics";
 import type { CreateProfileInput, UpdateProfileInput } from "@/lib/validation";
 import type { Profile, ProfileWithTotals } from "@/types";
 
@@ -21,20 +21,7 @@ export async function listProfilesWithTotals(): Promise<ProfileWithTotals[]> {
   ]);
 
   const byId = new Map(sums.map((s) => [s.profileId, s._sum]));
-  return profiles.map((p) => {
-    const sum = byId.get(p.id);
-    return {
-      ...p,
-      totals: sum
-        ? {
-            calls: sum.calls ?? 0,
-            round1: sum.round1 ?? 0,
-            round2: sum.round2 ?? 0,
-            round3: sum.round3 ?? 0,
-          }
-        : emptyMetrics(),
-    };
-  });
+  return profiles.map((p) => ({ ...p, totals: metricsFromSums(byId.get(p.id)) }));
 }
 
 export async function createProfile(input: CreateProfileInput): Promise<Profile> {

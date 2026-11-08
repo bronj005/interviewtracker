@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 export function Box({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-2 border-neutral-900 bg-white shadow-[3px_3px_0_0_#171717]", className)}
+      className={cn("border-2 border-ink bg-surface shadow-[3px_3px_0_0_var(--shadow)]", className)}
       {...props}
     />
   );
